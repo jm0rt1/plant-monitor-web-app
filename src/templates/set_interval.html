@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Set Polling Interval</title>
+</head>
+
+<body>
+    <h1>Set Polling Interval</h1>
+    <form method="post">
+        <label for="interval">Polling Interval (seconds):</label>
+        <input type="number" id="interval" name="interval" min="1" value="{{ interval }}">
+        <button type="submit">Update Interval</button>
+    </form>
+    <p>Current interval: {{ interval }} seconds</p>
+</body>
+
+</html>

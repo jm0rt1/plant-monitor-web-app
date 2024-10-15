@@ -1,12 +1,13 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 import requests
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from apscheduler.schedulers.background import BackgroundScheduler as sch
+
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import DatetimeTickFormatter
 from bokeh.resources import CDN
-
 
 app = Flask(__name__)
 
@@ -20,7 +21,9 @@ db = SQLAlchemy(app)
 arduino_ip = '192.168.4.58'  # Adjust the IP address
 arduino_port = 80  # Port number
 
-# Define the database model
+
+scheduler = sch()
+scheduler.start()
 
 
 class SensorReading(db.Model):
@@ -118,5 +121,49 @@ def plot():
     return render_template('bokeh_plot.html', script=script, div=div, bokeh_css=bokeh_css, bokeh_js=bokeh_js)
 
 
+@app.route('/set_interval', methods=['GET', 'POST'])
+def set_interval():
+
+    if request.method == 'POST':
+        new_interval = int(request.form['interval'])
+        # Update the job interval
+        scheduler.reschedule_job(
+            'poll_sensor_job', trigger='interval', seconds=new_interval)
+        return redirect(url_for('set_interval'))
+    else:
+        # Get current interval
+        job = scheduler.get_job('poll_sensor_job')
+        interval = job.trigger.interval.total_seconds()
+        return render_template('set_interval.html', interval=interval)
+
+
+def poll_sensor_data():
+    with app.app_context():
+        try:
+            # Construct the URL to request sensor data
+            url = f'http://{arduino_ip}:{arduino_port}/'
+
+            # Send GET request to the Arduino
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()  # Raise exception for HTTP errors
+
+            # Get sensor value from Arduino's response
+            sensor_value = float(response.text.split(":")[-1].strip())
+
+            # Store the sensor value in the database
+            new_reading = SensorReading(sensor_value=sensor_value)
+            db.session.add(new_reading)
+            db.session.commit()
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error polling sensor data: {e}")
+
+
+scheduler.add_job(
+    id='poll_sensor_job',
+    func=poll_sensor_data,
+    trigger='interval',
+    seconds=60  # Default interval
+)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=7070)
