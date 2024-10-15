@@ -1,13 +1,12 @@
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-import base64
-import io
-import matplotlib.pyplot as plt
 from flask import Flask, jsonify, render_template
 import requests
-import matplotlib
-# Use a non-interactive backend suitable for server environments
-matplotlib.use('Agg')
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models import DatetimeTickFormatter
+from bokeh.resources import CDN
+
 
 app = Flask(__name__)
 
@@ -18,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Replace with your Arduino's IP address
-arduino_ip = '192.168.1.X'  # Adjust the IP address
+arduino_ip = '192.168.4.58'  # Adjust the IP address
 arduino_port = 80  # Port number
 
 # Define the database model
@@ -26,8 +25,7 @@ arduino_port = 80  # Port number
 
 class SensorReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(
-        db.DateTime, default=datetime.now())
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     sensor_value = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -39,16 +37,16 @@ with app.app_context():
     db.create_all()
 
 
-@ app.route('/')
+@app.route('/')
 def index():
     return 'Welcome to the Flask Server!'
 
 
-@ app.route('/get_sensor_data')
+@app.route('/get_sensor_data')
 def get_sensor_data():
     try:
         # Construct the URL to request sensor data
-        url = f'http://192.168.4.58:80'
+        url = f'http://{arduino_ip}:{arduino_port}/'
 
         # Send GET request to the Arduino
         response = requests.get(url, timeout=5)
@@ -69,35 +67,55 @@ def get_sensor_data():
         return jsonify({'error': str(e)}), 500
 
 
-@ app.route('/plot')
+@app.route('/plot')
 def plot():
     # Fetch data from the database
     readings = SensorReading.query.order_by(SensorReading.timestamp).all()
-
-    # Extract timestamps and sensor values
     timestamps = [reading.timestamp for reading in readings]
     sensor_values = [reading.sensor_value for reading in readings]
 
-    # Create the plot
-    fig, ax = plt.subplots()
-    ax.plot(timestamps, sensor_values, marker='o')
-    ax.set_title('Sensor Data Over Time')
-    ax.set_xlabel('Timestamp')
-    ax.set_ylabel('Sensor Value')
-    ax.grid(True)
-    fig.autofmt_xdate()
+    # Create a Bokeh plot with updated parameters
+    plot = figure(
+        title='Sensor Data Over Time',
+        x_axis_type='datetime',
+        width=800,
+        height=400
+    )
 
-    # Save the plot to a bytes buffer
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    plt.close(fig)
+    # Plot the line
+    plot.line(
+        x=timestamps,
+        y=sensor_values,
+        line_width=2,
+        legend_label='Sensor Value',
+    )
 
-    # Encode the plot image to display in HTML
-    image_base64 = base64.b64encode(buf.getvalue()).decode('ascii')
+    # Plot the scatter points using 'scatter' instead of 'circle'
+    plot.scatter(
+        x=timestamps,
+        y=sensor_values,
+        fill_color="white",
+        size=8,
+    )
 
-    # Render the HTML template with the plot
-    return render_template('plot.html', image_base64=image_base64)
+    # Configure axes
+    plot.xaxis.axis_label = 'Timestamp'
+    plot.yaxis.axis_label = 'Sensor Value'
+    plot.xaxis.formatter = DatetimeTickFormatter(
+        hours="%H:%M",
+        days="%d %b",
+        months="%d %b %Y",
+        years="%d %b %Y",
+    )
+    plot.xaxis.major_label_orientation = 0.5
+
+    # Generate the script and div components
+    script, div = components(plot)
+    # Get the Bokeh CSS and JS resources
+    bokeh_css = CDN.render_css()
+    bokeh_js = CDN.render_js()
+    # Render the template
+    return render_template('bokeh_plot.html', script=script, div=div, bokeh_css=bokeh_css, bokeh_js=bokeh_js)
 
 
 if __name__ == '__main__':
