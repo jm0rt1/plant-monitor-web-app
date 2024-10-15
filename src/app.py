@@ -26,7 +26,8 @@ arduino_port = 80  # Port number
 
 class SensorReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(
+        db.DateTime, default=datetime.now())
     sensor_value = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -38,23 +39,23 @@ with app.app_context():
     db.create_all()
 
 
-@app.route('/')
+@ app.route('/')
 def index():
     return 'Welcome to the Flask Server!'
 
 
-@app.route('/get_sensor_data')
+@ app.route('/get_sensor_data')
 def get_sensor_data():
     try:
         # Construct the URL to request sensor data
-        url = f'http://{arduino_ip}:{arduino_port}/sensor'
+        url = f'http://192.168.4.58:80'
 
         # Send GET request to the Arduino
         response = requests.get(url, timeout=5)
         response.raise_for_status()  # Raise exception for HTTP errors
 
         # Get sensor value from Arduino's response
-        sensor_value = float(response.text.strip())
+        sensor_value = float(response.text.split(":")[-1].strip())
 
         # Store the sensor value in the database
         new_reading = SensorReading(sensor_value=sensor_value)
@@ -68,7 +69,7 @@ def get_sensor_data():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/plot')
+@ app.route('/plot')
 def plot():
     # Fetch data from the database
     readings = SensorReading.query.order_by(SensorReading.timestamp).all()
@@ -100,4 +101,4 @@ def plot():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=7070)
