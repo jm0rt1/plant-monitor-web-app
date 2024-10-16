@@ -1,3 +1,4 @@
+from bokeh.models import AjaxDataSource, CustomJS
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 import requests
 from datetime import datetime
@@ -8,6 +9,8 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import DatetimeTickFormatter
 from bokeh.resources import CDN
+from bokeh.models import AjaxDataSource
+
 
 app = Flask(__name__)
 
@@ -70,54 +73,80 @@ def get_sensor_data():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/plot')
-def plot():
+@app.route('/data')
+def data():
     # Fetch data from the database
     readings = SensorReading.query.order_by(SensorReading.timestamp).all()
-    timestamps = [reading.timestamp for reading in readings]
-    sensor_values = [reading.sensor_value for reading in readings]
+    # Prepare data for AjaxDataSource
+    data = {
+        'x': [reading.timestamp.isoformat() for reading in readings],
+        'y': [reading.sensor_value for reading in readings],
+    }
+    return jsonify(data)
 
-    # Create a Bokeh plot with updated parameters
+
+@app.route('/plot')
+def plot():
+    source = AjaxDataSource(
+        data_url=url_for('data', _external=True),
+        polling_interval=2000,
+        mode='replace'
+    )
+
+    # source.callback = CustomJS(code="""
+    #     const result = cb_data.response;
+    #     source.data = {
+    #         x: result.x.map(ts => ts),  // Timestamps are already in milliseconds
+    #         y: result.y
+    #     };
+    #     source.change.emit();
+    # """, args={'source': source})
+
     plot = figure(
         title='Sensor Data Over Time',
         x_axis_type='datetime',
         width=800,
-        height=400
+        height=400,
+        tools='pan,wheel_zoom,box_select,lasso_select,tap,reset'
     )
 
-    # Plot the line
     plot.line(
-        x=timestamps,
-        y=sensor_values,
+        x='x',
+        y='y',
+        source=source,
         line_width=2,
         legend_label='Sensor Value',
     )
 
-    # Plot the scatter points using 'scatter' instead of 'circle'
-    plot.scatter(
-        x=timestamps,
-        y=sensor_values,
-        fill_color="white",
+    plot.circle(
+        x='x',
+        y='y',
+        source=source,
         size=8,
+        fill_color='white',
+        selection_color='firebrick',
+        nonselection_fill_color='gray',
+        nonselection_fill_alpha=0.2
     )
 
-    # Configure axes
     plot.xaxis.axis_label = 'Timestamp'
     plot.yaxis.axis_label = 'Sensor Value'
     plot.xaxis.formatter = DatetimeTickFormatter(
+        milliseconds="%H:%M:%S",
+        seconds="%H:%M:%S",
+        minsec="%H:%M:%S",
+        minutes="%H:%M",
+        hourmin="%H:%M",
         hours="%H:%M",
         days="%d %b",
-        months="%d %b %Y",
-        years="%d %b %Y",
+        months="%b %Y",
+        years="%Y",
     )
     plot.xaxis.major_label_orientation = 0.5
 
-    # Generate the script and div components
     script, div = components(plot)
-    # Get the Bokeh CSS and JS resources
-    bokeh_css = CDN.render_css()
-    bokeh_js = CDN.render_js()
-    # Render the template
+    bokeh_css = INLINE.render_css()
+    bokeh_js = INLINE.render_js()
     return render_template('bokeh_plot.html', script=script, div=div, bokeh_css=bokeh_css, bokeh_js=bokeh_js)
 
 
@@ -163,7 +192,7 @@ scheduler.add_job(
     id='poll_sensor_job',
     func=poll_sensor_data,
     trigger='interval',
-    seconds=60  # Default interval
+    seconds=1  # Default interval
 )
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=7070)
