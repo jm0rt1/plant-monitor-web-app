@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler as sch
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import DatetimeTickFormatter
-from bokeh.resources import CDN
+from bokeh.resources import CDN, INLINE
 from bokeh.models import AjaxDataSource
 
 
@@ -90,9 +90,10 @@ def plot():
     source = AjaxDataSource(
         data_url=url_for('data', _external=True),
         polling_interval=2000,
-        mode='replace'
+        method='GET',
+        mode='replace',
+        content_type='application/json'
     )
-
     # source.callback = CustomJS(code="""
     #     const result = cb_data.response;
     #     source.data = {
