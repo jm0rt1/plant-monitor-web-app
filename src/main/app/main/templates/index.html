@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Devices</h2>
+<ul>
+    {% for device in devices %}
+    <li><a href="{{ url_for('main.device_detail', device_id=device['device_id']) }}">{{ device['device_id'] }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

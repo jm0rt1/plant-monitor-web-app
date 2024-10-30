@@ -1,6 +1,10 @@
-venv
+venv/
+__pycache__/
 *.pyc
 */__pycache__/
 output/logs/
 plant-monitor.code-workspace
 instance/
+*.sqlite
+.env
+.DS_Store
