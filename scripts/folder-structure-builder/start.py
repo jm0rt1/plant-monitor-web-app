@@ -15,7 +15,7 @@ with open(filename, 'r') as file:
 
         # Adjust the current path according to the indentation level
 
-        prev_name = prev_name[:level-1] + [name]
+        prev_name = prev_name[:level] + [name]
 
         full_path = os.path.join(base_path, *prev_name)
 

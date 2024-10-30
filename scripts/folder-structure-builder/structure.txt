@@ -44,22 +44,22 @@
                 logger.py
     /libraries
         /external
-            .gitkeep
+            note.md
 /test
     /unit
-        .gitkeep
+        note.md
     /integration
-        .gitkeep
+        note.md
 /docs
     /design
-        .gitkeep
+        note.md
     /api
-        .gitkeep
+        note.md
 /bin
 /build
 /lib
     /external
-        .gitkeep
+        note.md
 /.github
     /workflows
         python-app.yml
