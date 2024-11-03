@@ -1,5 +1,4 @@
-from flask import render_template, redirect, url_for, flash
-from . import main
+from flask import Blueprint, render_template, redirect, url_for, flash
 from ..database.implementations.database_manager import DatabaseManager
 from ..devices.factories.sensor_device_factory import SensorDeviceFactory
 from ..visualization.implementations.visualizer import Visualizer
@@ -9,6 +8,13 @@ db_manager = DatabaseManager()
 device_factory = SensorDeviceFactory()
 visualizer = Visualizer()
 logger = get_logger(__name__)
+
+# Other imports...
+
+# Define the Blueprint here
+main = Blueprint('main', __name__)
+
+# Rest of the code...
 
 
 @main.route('/')

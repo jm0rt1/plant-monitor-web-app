@@ -1,7 +1,7 @@
 from ...visualization.interfaces.ivisualizer import IVisualizer
 import plotly.express as px
 import pandas as pd
-from flask import Markup
+from markupsafe import Markup  # Updated import
 from typing import List, Dict, Any
 
 

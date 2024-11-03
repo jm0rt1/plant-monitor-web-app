@@ -23,7 +23,8 @@
     "python.testing.unittestEnabled": true,
     "python.analysis.diagnosticMode": "workspace",
     "python.analysis.extraPaths": [
-        "./src"
+        "./src",
+        "./src/main"
     ],
     "python.terminal.activateEnvironment": true,
     "[python]": {

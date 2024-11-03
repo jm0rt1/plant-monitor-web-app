@@ -1,5 +1,5 @@
 from ..interfaces.ifirmware_updater import IFirmwareUpdater
-from ..devices.interfaces.isensor_device import ISensorDevice
+from devices.interfaces.isensor_device import ISensorDevice
 
 
 class FirmwareUpdater(IFirmwareUpdater):

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..devices.interfaces.isensor_device import ISensorDevice
+from devices.interfaces.isensor_device import ISensorDevice
 
 
 class IFirmwareUpdater(ABC):
