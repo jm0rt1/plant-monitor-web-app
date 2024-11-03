@@ -1,4 +1,4 @@
-from .. import db
+from src.main.app import db
 
 
 class DeviceInfo(db.Model):

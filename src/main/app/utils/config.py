@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -23,8 +24,14 @@ class ProductionConfig(Config):
     )
 
 
-config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
+class ConfigType(str, Enum):
+    development = 'development'
+    production = 'production'
+    default = 'default'
+
+
+config: dict[ConfigType, type[Config]] = {
+    ConfigType.development: DevelopmentConfig,
+    ConfigType.production: ProductionConfig,
+    ConfigType.default: DevelopmentConfig
 }

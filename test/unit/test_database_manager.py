@@ -1,14 +1,13 @@
 import unittest
-from src.main.app.database.implementations.database_manager import DatabaseManager
-from src.main.app import create_app, db
-from src.main.app.main.models import DeviceInfo, SensorData
+from src.main.app.database.implementations.database_manager import DatabaseManager, db
+from src.main.app import create_app
 import os
 
 
 class TestDatabaseManager(unittest.TestCase):
     def setUp(self):
-        os.environ['FLASK_CONFIG'] = 'testing'
-        app = create_app('testing')
+        os.environ['FLASK_CONFIG'] = 'development'
+        app = create_app('development')
         app.app_context().push()
         db.create_all()
         self.db_manager = DatabaseManager()
