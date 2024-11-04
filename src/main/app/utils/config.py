@@ -1,7 +1,8 @@
 from enum import Enum
 import os
+from pathlib import Path
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = Path("instance").resolve()
 
 
 class Config:

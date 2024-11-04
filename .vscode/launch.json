@@ -9,6 +9,10 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/main/run.py",
+            "args": [
+                "--config",
+                "development"
+            ],
             "console": "integratedTerminal",
             "justMyCode": true
         }

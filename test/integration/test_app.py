@@ -1,7 +1,7 @@
 import unittest
 from src.main.run import app
 from src.main.app import db
-from src.main.app.main.models import DeviceInfo
+from app.database.models import DeviceInfo
 import os
 
 

@@ -1,5 +1,5 @@
 from ..interfaces.idatabase_manager import IDatabaseManager
-from ...main.models import DeviceInfo, SensorData
+from ...database.models import DeviceInfo, SensorData
 from ... import db
 from typing import Dict, Any, List
 from datetime import datetime
