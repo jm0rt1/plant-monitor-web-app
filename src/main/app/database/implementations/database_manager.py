@@ -1,6 +1,6 @@
-from src.main.app.database.interfaces.idatabase_manager import IDatabaseManager
-from src.main.app.main.models import DeviceInfo, SensorData
-from src.main.app import db
+from ..interfaces.idatabase_manager import IDatabaseManager
+from ...main.models import DeviceInfo, SensorData
+from ... import db
 from typing import Dict, Any, List
 from datetime import datetime
 

@@ -1,20 +1,20 @@
 import unittest
 from src.main.app.database.implementations.database_manager import DatabaseManager, db
-from src.main.app import create_app
+from src.main.app import create_app, ConfigType
 import os
 
 
 class TestDatabaseManager(unittest.TestCase):
     def setUp(self):
         os.environ['FLASK_CONFIG'] = 'development'
-        app = create_app('development')
+        app = create_app(ConfigType.development)
         app.app_context().push()
         db.create_all()
         self.db_manager = DatabaseManager()
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+    # def tearDown(self):
+    #     db.session.remove()
+    #     db.drop_all()
 
     def test_save_and_get_device_info(self):
         device_info = {

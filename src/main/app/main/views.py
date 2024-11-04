@@ -19,7 +19,9 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
+
     devices = db_manager.get_all_devices()
+
     return render_template('index.html', devices=devices)
 
 

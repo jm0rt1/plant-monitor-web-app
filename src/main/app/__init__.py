@@ -15,7 +15,7 @@ def create_app(config_name: ConfigType) -> Flask:
     bootstrap.init_app(app)  # type:ignore
 
     # Register blueprints
-    from src.main.app.main.views import main as main_blueprint
+    from .main.views import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
     return app
