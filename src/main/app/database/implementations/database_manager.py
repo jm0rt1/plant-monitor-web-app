@@ -21,17 +21,18 @@ class DatabaseManager(IDatabaseManager):
 
     def save_device_info(self, info: Dict[str, Any]) -> None:
         device_info = DeviceInfo.query.filter_by(
-            device_id=info['device_id']).first()
+            device_name=info['device_name']).first()
         if not device_info:
-            device_info = DeviceInfo(device_id=info['device_id'])
+            device_info = DeviceInfo(device_name=info['device_name'])
         device_info.firmware_version = info['firmware_version']
         device_info.last_seen = datetime.utcnow()
         device_info.additional_info = info.get('additional_info', {})
         db.session.add(device_info)
         db.session.commit()
 
-    def get_device_info(self, device_id: str) -> Dict[str, Any]:
-        device_info = DeviceInfo.query.filter_by(device_id=device_id).first()
+    def get_device_info(self, device_name: str) -> Dict[str, Any]:
+        device_info = DeviceInfo.query.filter_by(
+            device_name=device_name).first()
         return device_info.to_dict() if device_info else {}
 
     def get_all_devices(self) -> List[Dict[str, Any]]:

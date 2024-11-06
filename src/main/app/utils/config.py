@@ -18,6 +18,14 @@ class DevelopmentConfig(Config):
     )
 
 
+class TestConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'DEV_DATABASE_URL',
+        'sqlite:///' + os.path.join(basedir, 'test-dev.db')
+    )
+
+
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
@@ -29,10 +37,13 @@ class ConfigType(str, Enum):
     development = 'development'
     production = 'production'
     default = 'default'
+    test = 'test'
 
 
 config: dict[ConfigType, type[Config]] = {
     ConfigType.development: DevelopmentConfig,
     ConfigType.production: ProductionConfig,
-    ConfigType.default: DevelopmentConfig
+    ConfigType.default: DevelopmentConfig,
+    ConfigType.test: TestConfig
+
 }
