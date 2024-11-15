@@ -47,3 +47,11 @@ def collect_data():
             logger.error(f"Error collecting data from device {ip}: {e}")
     flash('Data collection completed.')
     return redirect(url_for('.index'))
+
+# Route that displays a table with all the data
+
+
+@main.route('/data-table')
+def data_table():
+    sensor_data = db_manager.get_sensor_data(1)
+    return render_template('data_table.html', sensor_data=sensor_data)

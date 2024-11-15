@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+    <p>Here is the data from sensor 1:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Soil Moisture</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in sensor_data %}
+            <tr>
+                <td>{{ data.timestamp }}</td>
+                <td>{{ data.data.temperature }}</td>
+                <td>{{ data.data.humidity }}</td>
+                <td>{{ data.soil_moisture }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>Temperature Plot</h1>
+    <div id="temperature_plot"></div>
+    <h1>Humidity Plot</h1>
+    <div id="humidity_plot"></div>
+    <h1>Soil Moisture Plot</h1>
+    <div id="soil_moisture_plot"></div>
+    <script>
+        var temperature_data = {
+            x: {{ sensor_data | map(attribute='timestamp') | list | safe }},
+            y: {{ sensor_data | map(attribute='data.temperature') | list | safe }},
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Temperature'
+        };
+
+        var temperature_layout = {
+            title: 'Temperature Plot',
+            xaxis: {
+                title: 'Timestamp'
+            },
+            yaxis: {
+                title: 'Temperature'
+            }
+        };
+
+        Plotly.newPlot('temperature_plot', [temperature_data], temperature_layout);
+    </script>
+</body>
+</html>

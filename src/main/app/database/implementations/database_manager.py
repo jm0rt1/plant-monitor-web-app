@@ -15,7 +15,7 @@ class DatabaseManager(IDatabaseManager):
         db.session.add(sensor_data)
         db.session.commit()
 
-    def get_sensor_data(self, device_id: str) -> List[Dict[str, Any]]:
+    def get_sensor_data(self, device_id: int) -> List[Dict[str, Any]]:
         records = SensorData.query.filter_by(device_id=device_id).all()
         return [record.to_dict() for record in records]
 
