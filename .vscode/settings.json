@@ -34,5 +34,9 @@
     ,
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingTypeStubs": "none"
-    }
+    },
+    "python.analysis.importFormat": [
+        "--skip",
+        "create_dev_database.py"
+    ],
 }

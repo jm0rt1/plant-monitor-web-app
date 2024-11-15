@@ -3,7 +3,7 @@ from .. import db
 
 class DeviceInfo(db.Model):
     __tablename__ = 'device_info'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, auto_increment=True)
     device_name = db.Column(db.String(64), unique=True)
     firmware_version = db.Column(db.String(64))
     last_seen = db.Column(db.DateTime)
@@ -20,7 +20,7 @@ class DeviceInfo(db.Model):
 
 class SensorData(db.Model):
     __tablename__ = 'sensor_data'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, auto_increment=True)
     device_id = db.Column(
         db.Integer, db.ForeignKey('device_info.id'))
     timestamp = db.Column(db.DateTime)
