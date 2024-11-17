@@ -1,11 +1,38 @@
-{% extends 'base.html' %}
-
-{% block title %}Device {{ device_info['device_id'] }}{% endblock %}
-
-{% block content %}
-<h2>Device {{ device_info['device_id'] }}</h2>
-<p>Firmware Version: {{ device_info['firmware_version'] }}</p>
-<p>Last Seen: {{ device_info['last_seen'] }}</p>
-<!-- Render the visualization -->
-<div>{{ graph | safe }}</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+    <p>Here is the data from sensor 1:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Soil Moisture</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in sensor_data %}
+            <tr>
+                <td>{{ data.timestamp }}</td>
+                <td>{{ data.data.temperature }}</td>
+                <td>{{ data.data.humidity }}</td>
+                <td>{{ data.soil_moisture }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>Temperature Plot</h1>
+    <div id="temperature_plot"></div>
+    <script>
+        var graphJSON = {{ graphJSON | safe }};
+        Plotly.newPlot('temperature_plot', graphJSON.data, graphJSON.layout);
+    </script>
+</body>
+</html>

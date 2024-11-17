@@ -30,9 +30,9 @@ class DatabaseManager(IDatabaseManager):
         db.session.add(device_info)
         db.session.commit()
 
-    def get_device_info(self, device_name: str) -> Dict[str, Any]:
+    def get_device_info(self, device_id: str) -> Dict[str, Any]:
         device_info = DeviceInfo.query.filter_by(
-            device_name=device_name).first()
+            id=device_id).first()
         return device_info.to_dict() if device_info else {}
 
     def get_all_devices(self) -> List[Dict[str, Any]]:
