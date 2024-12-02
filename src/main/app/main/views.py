@@ -84,7 +84,9 @@ def device_detail(device_id):
 
     timestamps = [data['timestamp'] for data in sensor_data]
     temperatures = [data['data']['temperature'] for data in sensor_data]
+    humidities = [data['data']['humidity'] for data in sensor_data]
     # Create the plot
+
     temperature_trace = go.Scatter(
         x=timestamps,
         y=temperatures,
@@ -99,9 +101,27 @@ def device_detail(device_id):
     )
 
     fig = go.Figure(data=[temperature_trace], layout=layout)
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    temperature_graph_json = json.dumps(
+        fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-    return render_template('device_detail.html', graphJSON=graphJSON)
+    # Create the plot
+    humidity_trace = go.Scatter(
+        x=timestamps,
+        y=humidities,
+        mode='lines+markers',
+        name='Humidity'
+    )
+
+    layout = go.Layout(
+        title='Humidity Plot',
+        xaxis=dict(title='Timestamp'),
+        yaxis=dict(title='Humidity')
+    )
+
+    fig2 = go.Figure(data=[humidity_trace], layout=layout)
+    humidity_graph_json = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template('device_detail.html', temperature_graph=temperature_graph_json, humidity_graph=humidity_graph_json)
 
 
 @main.route('/collect-data')

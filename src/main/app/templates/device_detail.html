@@ -30,9 +30,14 @@
     </table>
     <h1>Temperature Plot</h1>
     <div id="temperature_plot"></div>
-    <script>
-        var graphJSON = {{ graphJSON | safe }};
-        Plotly.newPlot('temperature_plot', graphJSON.data, graphJSON.layout);
-    </script>
+        <script>
+            var temperature = {{ temperature_graph | safe }};
+            Plotly.newPlot('temperature_plot', temperature.data, temperature.layout);
+        </script>
+    <div id="humidity_plot"></div>
+        <script>
+            var humidity = {{ humidity_graph | safe }};
+            Plotly.newPlot('humidity_plot', humidity.data, humidity.layout);
+        </script>
 </body>
 </html>
